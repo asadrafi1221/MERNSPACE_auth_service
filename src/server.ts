@@ -4,4 +4,5 @@ function welcome(name: string) {
     };
 }
 
+console.log('helo');
 console.log(welcome('fullstack mastery'));
