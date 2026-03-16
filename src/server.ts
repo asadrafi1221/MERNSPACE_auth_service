@@ -1,5 +1,7 @@
 function welcome(name: string) {
-    console.log(`welcome ${name}`);
+    return {
+        username: name,
+    };
 }
 
-welcome('fullstack mastery');
+console.log(welcome('fullstack mastery'));
