@@ -1,0 +1,76 @@
+# dependencies
+node_modules/
+
+# environment variables
+.env
+.env.*
+!.env.example
+
+# logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# coverage
+coverage/
+*.lcov
+
+# build output
+dist/
+build/
+.next/
+out/
+
+# cache
+.cache/
+.parcel-cache/
+.npm
+.eslintcache
+
+# temporary files
+tmp/
+temp/
+
+# system files
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# testing
+.nyc_output/
+
+# package manager files
+.pnp/
+.pnp.js
+
+# docker
+docker-compose.override.yml
+
+# misc
+*.tgz
+*.tar.gz
+
+# uploads (if your app stores user files)
+uploads/
+public/uploads/
+
+# local config
+config/local.json
+config/local.js
