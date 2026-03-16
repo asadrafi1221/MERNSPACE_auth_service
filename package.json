@@ -5,6 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
+    "format:fix": "prettier . --write",
+    "format:check": "prettier . --check",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "prettier": "3.8.1",
     "typescript": "^5.9.3"
   }
 }
