@@ -4,7 +4,6 @@ import logger from './config/logger';
 
 const startServer = () => {
     const PORT = CONFIG.PORT;
-
     try {
         app.listen(PORT, () => {
             logger.info(`Server running on port ${PORT}`);
