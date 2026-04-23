@@ -1,7 +1,7 @@
 {
     "name": "auth-service",
     "version": "1.0.0",
-    "description": "",
+    "description": "Authentication service for MERNSPACE",
     "main": "index.js",
     "scripts": {
         "dev": "nodemon --exec \"ts-node\" src/server.ts",
@@ -19,7 +19,10 @@
         "dotenv": "^17.3.1",
         "express": "^5.2.1",
         "http-errors": "^2.0.1",
-        "ts-node": "^10.9.2"
+        "pg": "^8.20.0",
+        "reflect-metadata": "^0.2.2",
+        "ts-node": "^10.9.2",
+        "typeorm": "^0.3.28"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",

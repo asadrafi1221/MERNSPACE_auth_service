@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import express, { Request, Response, NextFunction } from 'express';
 import { HttpError } from 'http-errors';
 import logger from './config/logger';
@@ -26,4 +28,5 @@ app.use((err: HttpError, req: Request, res: Response, next: NextFunction) => {
         ],
     });
 });
+
 export default app;
