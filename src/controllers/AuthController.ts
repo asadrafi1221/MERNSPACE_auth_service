@@ -7,6 +7,7 @@ import { Logger } from 'winston';
 import { JwtPayload, sign } from 'jsonwebtoken';
 import path from 'path';
 import createHttpError from 'http-errors';
+import { CONFIG } from '../config';
 
 export class AuthController {
     userService: UserService;
@@ -58,7 +59,15 @@ export class AuthController {
                 algorithm: 'RS256',
                 issuer: 'auth-service',
             });
-            const refreshToken = '343e4ei3me3e';
+            const refreshToken = sign(
+                payload,
+                CONFIG.REFRESH_TOKEN_SECRET as string,
+                {
+                    expiresIn: '1y',
+                    algorithm: 'HS256',
+                    issuer: 'auth-service',
+                },
+            );
 
             res.cookie('accessToken', accessToken, {
                 domain: 'localhost',
@@ -70,7 +79,7 @@ export class AuthController {
             res.cookie('refreshToken', refreshToken, {
                 domain: 'localhost',
                 sameSite: 'strict',
-                maxAge: 1000 * 60 * 60 * 24 * 365, // 2h
+                maxAge: 1000 * 60 * 60 * 24 * 365, // 1y
                 httpOnly: true, // Very Important
             });
 
