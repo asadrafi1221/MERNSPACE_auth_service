@@ -27,7 +27,7 @@ describe('POST /auth/register', () => {
             // Arrange
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -44,7 +44,7 @@ describe('POST /auth/register', () => {
             // Arrange
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -61,7 +61,7 @@ describe('POST /auth/register', () => {
             // Arrange
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -86,7 +86,7 @@ describe('POST /auth/register', () => {
         it('should return id of the created user', async () => {
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -113,7 +113,7 @@ describe('POST /auth/register', () => {
         it('should assign customer role', async () => {
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -131,7 +131,7 @@ describe('POST /auth/register', () => {
         it('should store the hashpassword in the database', async () => {
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -149,7 +149,7 @@ describe('POST /auth/register', () => {
         it('should return 400 status code if email already exist ', async () => {
             const userData = {
                 firstName: 'Rakesh',
-                lastName: 'K',
+                lastName: 'Kumar',
                 email: 'rakesh@gmail.com',
                 password: 'secret',
             };
@@ -171,6 +171,24 @@ describe('POST /auth/register', () => {
             // Assert
             expect(response.statusCode).toBe(400);
             expect(users).toHaveLength(1);
+        });
+    });
+
+    describe('Given missing fields', () => {
+        it('should return 400 status code if any field is missing', async () => {
+            const userData = {
+                lastName: 'Kumar',
+                email: 'rakesh@gmail.com',
+                password: 'secret',
+            };
+
+            //Act
+            const response = await request(app)
+                .post('/auth/register')
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
         });
     });
 });
