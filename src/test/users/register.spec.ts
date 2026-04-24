@@ -4,6 +4,7 @@ import app from '../../app';
 import request from 'supertest';
 import { truncateTables } from '../utils';
 import { User } from '../../entity/User';
+import { Roles } from '../../constants';
 
 describe('POST /auth/register', () => {
     let connection: DataSource;
@@ -82,7 +83,6 @@ describe('POST /auth/register', () => {
 
             expect(users[0].id).toBeDefined();
         });
-
         it('should return id of the created user', async () => {
             const userData = {
                 firstName: 'Rakesh',
@@ -109,6 +109,24 @@ describe('POST /auth/register', () => {
             expect(users[0].id).toBeDefined();
 
             expect(response.body).toHaveProperty('id');
+        });
+        it('should assign customer role', async () => {
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh@gmail.com',
+                password: 'secret',
+            };
+
+            //Act
+            await request(app).post('/auth/register').send(userData);
+            const userRepository = connection.getRepository(User);
+            const users = await userRepository.find();
+
+            //Assert
+
+            expect(users[0]).toHaveProperty('role');
+            expect(users[0].role).toBe(Roles.CUSTOMER);
         });
     });
 });
