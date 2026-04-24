@@ -23,6 +23,8 @@ pids
 *.seed
 *.pid.lock
 
+certs/
+
 # coverage
 coverage/
 *.lcov
