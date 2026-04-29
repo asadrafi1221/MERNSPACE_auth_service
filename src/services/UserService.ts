@@ -4,15 +4,17 @@ import { User } from '../entity/User';
 import { UserData } from '../types';
 import { Roles } from '../constants';
 import createHttpError from 'http-errors';
-import bcrypt from 'bcrypt';
+import { CredentialService } from './CredentialService';
 
 export class UserService {
-    constructor(private userRepository: Repository<User>) {}
+    constructor(
+        private userRepository: Repository<User>,
+        private credentialService: CredentialService,
+    ) {}
 
     async create({ firstName, lastName, email, password }: UserData) {
-        const saltRounds = 10;
-
-        const hashpassword = await bcrypt.hash(password, saltRounds);
+        const hashpassword =
+            await this.credentialService.hashPassword(password);
 
         const userExisted = await this.userRepository.findOne({
             where: { email },
@@ -39,5 +41,28 @@ export class UserService {
             );
             throw error;
         }
+    }
+
+    async login({ email, password }: { email: string; password: string }) {
+        const user = await this.userRepository.findOne({
+            where: { email },
+        });
+
+        if (!user) {
+            const error = createHttpError(401, 'Invalid credentials');
+            throw error;
+        }
+
+        const isPasswordValid = await this.credentialService.comparePassword(
+            password,
+            user.password,
+        );
+
+        if (!isPasswordValid) {
+            const error = createHttpError(401, 'Invalid credentials');
+            throw error;
+        }
+
+        return user;
     }
 }

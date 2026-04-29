@@ -1,23 +1,31 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/AuthController';
 import { UserService } from '../services/UserService';
+import { CredentialService } from '../services/CredentialService';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entity/User';
 import logger from '../config/logger';
 import { validate } from '../middleware/validation';
-import { registerUserSchema } from '../validators/user';
+import { loginUserSchema, registerUserSchema } from '../validators/user';
 import { RefreshToken } from '../entity/RefreshToken';
 import { TokenService } from '../services/TokenService';
 
 const authRouter = Router();
 const userRepository = AppDataSource.getRepository(User);
 const refreshTokenRepository = AppDataSource.getRepository(RefreshToken);
-const userService = new UserService(userRepository);
+const credentialService = new CredentialService();
+const userService = new UserService(userRepository, credentialService);
 const tokenService = new TokenService(refreshTokenRepository, logger);
 const authController = new AuthController(userService, tokenService, logger);
 
-authRouter.post('/register', validate(registerUserSchema), (req, res, next) =>
-    authController.register(req, res, next),
+authRouter.post(
+    '/register',
+    validate(registerUserSchema),
+    async (req, res, next) => await authController.register(req, res, next),
 );
+
+authRouter.post('/login', validate(loginUserSchema), async (req, res, next) => {
+    await authController.login(req, res, next);
+});
 
 export default authRouter;
