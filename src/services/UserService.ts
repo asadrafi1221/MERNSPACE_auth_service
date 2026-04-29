@@ -19,7 +19,7 @@ export class UserService {
         });
 
         if (userExisted) {
-            const error = createHttpError(400, 'Email already exist');
+            const error = createHttpError(400, 'Email alreadys exist');
             throw error;
         }
         try {

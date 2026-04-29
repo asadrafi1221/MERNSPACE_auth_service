@@ -8,6 +8,8 @@ import { JwtPayload, sign } from 'jsonwebtoken';
 import path from 'path';
 import createHttpError from 'http-errors';
 import { CONFIG } from '../config';
+import { AppDataSource } from '../config/data-source';
+import { RefreshToken } from '../entity/RefreshToken';
 
 export class AuthController {
     userService: UserService;
@@ -54,11 +56,25 @@ export class AuthController {
                 role: user.role,
             };
 
+            /// in RS256 there is a private and public key pair
             const accessToken = sign(payload, privateKey, {
                 expiresIn: '1h',
                 algorithm: 'RS256',
                 issuer: 'auth-service',
             });
+
+            const MS_IN_YEAR = 1000 * 60 * 60 * 24 * 365; // 1Y -> (leap year)
+
+            /// Persist the refresh Token
+            const refreshTokenRepository =
+                AppDataSource.getRepository(RefreshToken);
+
+            const newRefreshToken = await refreshTokenRepository.save({
+                user: user,
+                expiresAt: new Date(Date.now() + MS_IN_YEAR),
+            });
+
+            /// so basically HS256 is the algo where we store one secret key we sign and through it we also verify the token
             const refreshToken = sign(
                 payload,
                 CONFIG.REFRESH_TOKEN_SECRET as string,
@@ -66,6 +82,7 @@ export class AuthController {
                     expiresIn: '1y',
                     algorithm: 'HS256',
                     issuer: 'auth-service',
+                    jwtid: newRefreshToken.id.toString(),
                 },
             );
 

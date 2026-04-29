@@ -5,6 +5,7 @@ import request from 'supertest';
 import { isJwt, truncateTables } from '../utils';
 import { User } from '../../entity/User';
 import { Roles } from '../../constants';
+import { RefreshToken } from '../../entity/RefreshToken';
 
 describe('POST /auth/register', () => {
     let connection: DataSource;
@@ -212,6 +213,25 @@ describe('POST /auth/register', () => {
 
             expect(isJwt(accessToken)).toBeTruthy();
             expect(isJwt(refreshToken)).toBeTruthy();
+        });
+        it('should store the refresh token in the database', async () => {
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'Kumar',
+                email: 'rakesh@gmail.com',
+                password: 'secret',
+            };
+
+            //Act
+            await request(app).post('/auth/register').send(userData);
+
+            /// assert
+            const refreshTokenRepository =
+                connection.getRepository(RefreshToken);
+
+            const tokens = await refreshTokenRepository.find();
+
+            expect(tokens).toHaveLength(1);
         });
     });
 

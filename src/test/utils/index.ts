@@ -4,10 +4,18 @@ import { DataSource } from 'typeorm';
 export const truncateTables = async (connection: DataSource) => {
     const entities = connection.entityMetadatas;
 
-    for (const entity of entities) {
-        const repository = connection.getRepository(entity.name);
-        await repository.clear();
+    // Disable foreign key constraints temporarily
+    await connection.query('SET session_replication_role = replica;');
+
+    // Truncate all tables in reverse order of dependencies
+    const tableNames = entities.map((entity) => entity.tableName);
+
+    for (const tableName of tableNames) {
+        await connection.query(`TRUNCATE TABLE "${tableName}" CASCADE;`);
     }
+
+    // Re-enable foreign key constraints
+    await connection.query('SET session_replication_role = DEFAULT;');
 };
 
 export const isJwt = (token: string | null): boolean => {
