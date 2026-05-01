@@ -90,6 +90,7 @@ export class AuthController {
         console.log(req?.auth);
 
         const user = await this.userService.findById(Number(req?.auth?.id));
-        res.json(user);
+
+        res.json({ ...user, password: undefined });
     }
 }

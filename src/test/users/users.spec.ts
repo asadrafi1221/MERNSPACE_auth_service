@@ -72,6 +72,38 @@ describe('GET /auth/self', () => {
             // check if user id macthes with regsitser user
             expect((response.body as Record<string, string>).id).toBe(data?.id);
         });
+        it('should return  user password', async () => {
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'Kumar',
+                email: 'rakesh@gmail.com',
+                password: 'secret',
+            };
+
+            const userRepository = connection.getRepository(User);
+
+            const data = await userRepository.save({
+                ...userData,
+                role: Roles.CUSTOMER,
+            });
+            // Generta etoken
+            const accessToken = jwks.token({
+                sub: String(data?.id),
+                role: data?.role,
+            });
+            // add token to cookie
+
+            const response = await request(app)
+                .get('/auth/self')
+                .set('Cookie', [`accessToken=${accessToken}`])
+                .send();
+
+            // assert
+            // check if user id macthes with regsitser user
+            expect(response.body as Record<string, string>).not.toHaveProperty(
+                'password',
+            );
+        });
     });
 
     describe('Given missing fields', () => {});
