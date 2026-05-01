@@ -9,6 +9,8 @@ import { validate } from '../middleware/validation';
 import { loginUserSchema, registerUserSchema } from '../validators/user';
 import { RefreshToken } from '../entity/RefreshToken';
 import { TokenService } from '../services/TokenService';
+import { AuthRequest } from '../types';
+import { protect } from '../middleware/authenticate';
 
 const authRouter = Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -26,6 +28,10 @@ authRouter.post(
 
 authRouter.post('/login', validate(loginUserSchema), async (req, res, next) => {
     await authController.login(req, res, next);
+});
+
+authRouter.get('/self', protect, async (req, res) => {
+    await authController.self(req as AuthRequest, res);
 });
 
 export default authRouter;
