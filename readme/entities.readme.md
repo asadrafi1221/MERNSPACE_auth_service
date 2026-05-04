@@ -9,43 +9,46 @@ The Entities module contains TypeORM entity definitions that represent database 
 ### User (`src/entity/User.ts`)
 
 #### Purpose
+
 Represents user accounts in the system with authentication and profile information.
 
 #### Table Definition
+
 ```typescript
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
-  id!: number;
+    @PrimaryGeneratedColumn()
+    id!: number;
 
-  @Column({ type: 'varchar', length: 255 })
-  firstName!: string;
+    @Column({ type: 'varchar', length: 255 })
+    firstName!: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  lastName!: string;
+    @Column({ type: 'varchar', length: 255 })
+    lastName!: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  email!: string;
+    @Column({ type: 'varchar', length: 255, unique: true })
+    email!: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  password!: string;
+    @Column({ type: 'varchar', length: 255 })
+    password!: string;
 
-  @Column({
-    type: 'enum',
-    enum: Roles,
-    default: Roles.CUSTOMER,
-  })
-  role!: Roles;
+    @Column({
+        type: 'enum',
+        enum: Roles,
+        default: Roles.CUSTOMER,
+    })
+    role!: Roles;
 
-  @CreateDateColumn()
-  createdAt!: Date;
+    @CreateDateColumn()
+    createdAt!: Date;
 
-  @UpdateDateColumn()
-  updatedAt!: Date;
+    @UpdateDateColumn()
+    updatedAt!: Date;
 }
 ```
 
 #### Fields
+
 - **id**: Primary key, auto-generated integer
 - **firstName**: User's first name (max 255 characters)
 - **lastName**: User's last name (max 255 characters)
@@ -56,62 +59,68 @@ export class User {
 - **updatedAt**: Record last update timestamp
 
 #### Relationships
+
 - **One-to-Many**: Has many RefreshToken records
 - **Implicit**: Referenced by RefreshToken.user
 
 #### Role Enum
+
 ```typescript
 export enum Roles {
-  CUSTOMER = 'customer',
-  ADMIN = 'admin',
+    CUSTOMER = 'customer',
+    ADMIN = 'admin',
 }
 ```
 
 #### Usage Example
+
 ```typescript
 // Create user
 const user = userRepository.create({
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@example.com',
-  password: 'hashedPassword',
-  role: Roles.CUSTOMER,
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    password: 'hashedPassword',
+    role: Roles.CUSTOMER,
 });
 
 // Find user
 const user = await userRepository.findOne({
-  where: { email: 'john@example.com' },
-  relations: ['refreshTokens']
+    where: { email: 'john@example.com' },
+    relations: ['refreshTokens'],
 });
 ```
 
 ### RefreshToken (`src/entity/RefreshToken.ts`)
 
 #### Purpose
+
 Represents refresh tokens stored in the database for token revocation and rotation capabilities.
 
 #### Table Definition
+
 ```typescript
 @Entity()
 export class RefreshToken {
-  @PrimaryGeneratedColumn()
-  id!: number;
+    @PrimaryGeneratedColumn()
+    id!: number;
 
-  @Column({ type: 'timestamp' })
-  expiresAt!: Date;
+    @Column({ type: 'timestamp' })
+    expiresAt!: Date;
 
-  @ManyToOne(() => User)
-  user!: User;
+    @ManyToOne(() => User)
+    user!: User;
 
-  @CreateDateColumn()
-  createdAt!: Date;
+    @CreateDateColumn()
+    createdAt!: Date;
 
-  @UpdateDateColumn()
-  updatedAt!: Date;
+    @UpdateDateColumn()
+    updatedAt!: Date;
 }
 ```
 
 #### Fields
+
 - **id**: Primary key, auto-generated integer (used as JWT ID)
 - **expiresAt**: Token expiration timestamp
 - **user**: Foreign key relationship to User entity
@@ -119,24 +128,26 @@ export class RefreshToken {
 - **updatedAt**: Record last update timestamp
 
 #### Relationships
+
 - **Many-to-One**: Belongs to one User
 - **Database Level**: Foreign key constraint on user_id
 
 #### Usage Example
+
 ```typescript
 // Create refresh token
 const refreshToken = refreshTokenRepository.create({
-  user: user,
-  expiresAt: new Date(Date.now() + MS_IN_YEAR),
+    user: user,
+    expiresAt: new Date(Date.now() + MS_IN_YEAR),
 });
 
 // Find refresh token
 const token = await refreshTokenRepository.findOne({
-  where: {
-    id: Number(jti),
-    user: { id: Number(sub) }
-  },
-  relations: ['user']
+    where: {
+        id: Number(jti),
+        user: { id: Number(sub) },
+    },
+    relations: ['user'],
 });
 
 // Delete refresh token
@@ -146,21 +157,23 @@ await refreshTokenRepository.delete({ id: tokenId });
 ## Entity Patterns
 
 ### Base Entity Pattern
+
 ```typescript
 @Entity()
 export class BaseEntity {
-  @PrimaryGeneratedColumn()
-  id!: number;
+    @PrimaryGeneratedColumn()
+    id!: number;
 
-  @CreateDateColumn()
-  createdAt!: Date;
+    @CreateDateColumn()
+    createdAt!: Date;
 
-  @UpdateDateColumn()
-  updatedAt!: Date;
+    @UpdateDateColumn()
+    updatedAt!: Date;
 }
 ```
 
 ### Enum Field Pattern
+
 ```typescript
 @Column({
   type: 'enum',
@@ -171,6 +184,7 @@ role!: Roles;
 ```
 
 ### Relationship Pattern
+
 ```typescript
 // One-to-Many
 @OneToMany(() => RefreshToken, token => token.user)
@@ -182,6 +196,7 @@ user!: User;
 ```
 
 ### Validation Pattern
+
 ```typescript
 @Column({ type: 'varchar', length: 255, unique: true })
 email!: string;
@@ -193,6 +208,7 @@ firstName!: string;
 ## Database Schema
 
 ### Users Table
+
 ```sql
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
@@ -207,6 +223,7 @@ CREATE TABLE users (
 ```
 
 ### Refresh Tokens Table
+
 ```sql
 CREATE TABLE refresh_tokens (
   id SERIAL PRIMARY KEY,
@@ -221,11 +238,13 @@ CREATE TABLE refresh_tokens (
 ## Indexes and Constraints
 
 ### Users Table Indexes
+
 - **Primary Key**: `id` (auto-indexed)
 - **Unique Index**: `email` (enforced by unique constraint)
 - **Implicit Index**: `role` (for role-based queries)
 
 ### Refresh Tokens Table Indexes
+
 - **Primary Key**: `id` (auto-indexed)
 - **Foreign Key Index**: `user_id` (auto-created by foreign key)
 - **Query Index**: `(id, user_id)` for token validation
@@ -234,28 +253,33 @@ CREATE TABLE refresh_tokens (
 ## Data Integrity
 
 ### Constraints
+
 - **Email Uniqueness**: Prevents duplicate email addresses
 - **Foreign Key**: Ensures refresh tokens reference valid users
 - **Not Null**: Required fields cannot be null
 - **Enum Values**: Role field limited to predefined values
 
 ### Cascading Operations
+
 - **Delete Cascade**: When user is deleted, associated refresh tokens are also deleted
 - **Update Cascade**: Timestamp fields automatically updated
 
 ## Security Considerations
 
 ### Password Security
+
 - **Hashed Storage**: Passwords stored as bcrypt hashes
 - **No Plain Text**: Never store passwords in plain text
 - **Field Length**: Sufficient length for hash storage
 
 ### Token Security
+
 - **JWT ID Mapping**: Refresh token ID maps to database record
 - **Expiration Tracking**: Explicit expiration timestamps
 - **User Association**: Tokens tied to specific users
 
 ### Data Privacy
+
 - **PII Protection**: Personal information properly secured
 - **Access Control**: Database access controlled via repository pattern
 - **Audit Trail**: Timestamp fields provide audit capabilities
@@ -263,11 +287,13 @@ CREATE TABLE refresh_tokens (
 ## Performance Considerations
 
 ### Query Optimization
+
 - **Index Usage**: Appropriate indexes for common queries
 - **Relationship Loading**: Eager vs lazy loading based on use case
 - **Connection Pooling**: Database connections efficiently managed
 
 ### Memory Usage
+
 - **Entity Lifecycle**: Proper entity lifecycle management
 - **Lazy Loading**: Relationships loaded only when needed
 - **Connection Management**: Database connections properly closed
@@ -275,35 +301,45 @@ CREATE TABLE refresh_tokens (
 ## Migration Strategy
 
 ### Initial Migration
+
 ```typescript
 // Create users table
 await queryRunner.createTable(
-  new Table({
-    name: 'users',
-    columns: [
-      { name: 'id', type: 'int', isPrimary: true, isGenerated: true },
-      { name: 'firstName', type: 'varchar', length: '255' },
-      { name: 'lastName', type: 'varchar', length: '255' },
-      { name: 'email', type: 'varchar', length: '255', isUnique: true },
-      { name: 'password', type: 'varchar', length: '255' },
-      { name: 'role', type: 'enum', enum: Roles },
-      { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP' },
-      { name: 'updatedAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP' },
-    ],
-  }),
-  true
+    new Table({
+        name: 'users',
+        columns: [
+            { name: 'id', type: 'int', isPrimary: true, isGenerated: true },
+            { name: 'firstName', type: 'varchar', length: '255' },
+            { name: 'lastName', type: 'varchar', length: '255' },
+            { name: 'email', type: 'varchar', length: '255', isUnique: true },
+            { name: 'password', type: 'varchar', length: '255' },
+            { name: 'role', type: 'enum', enum: Roles },
+            {
+                name: 'createdAt',
+                type: 'timestamp',
+                default: 'CURRENT_TIMESTAMP',
+            },
+            {
+                name: 'updatedAt',
+                type: 'timestamp',
+                default: 'CURRENT_TIMESTAMP',
+            },
+        ],
+    }),
+    true,
 );
 ```
 
 ### Data Seeding
+
 ```typescript
 // Seed admin user
 const admin = userRepository.create({
-  firstName: 'Admin',
-  lastName: 'User',
-  email: 'admin@example.com',
-  password: hashedPassword,
-  role: Roles.ADMIN,
+    firstName: 'Admin',
+    lastName: 'User',
+    email: 'admin@example.com',
+    password: hashedPassword,
+    role: Roles.ADMIN,
 });
 await userRepository.save(admin);
 ```
@@ -311,11 +347,13 @@ await userRepository.save(admin);
 ## Testing
 
 ### Unit Testing
+
 - **Entity Validation**: Test field constraints and validations
 - **Relationship Testing**: Verify relationship mappings
 - **Business Logic**: Test entity methods and computed properties
 
 ### Integration Testing
+
 - **Database Operations**: Test CRUD operations
 - **Data Integrity**: Verify constraint enforcement
 - **Performance**: Test query performance with realistic data
@@ -323,6 +361,7 @@ await userRepository.save(admin);
 ## Future Entities
 
 The module is designed to accommodate additional entities:
+
 - `Profile`: Extended user profile information
 - `Session`: User session management
 - `AuditLog`: Audit trail for security events

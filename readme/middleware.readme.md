@@ -11,43 +11,49 @@ The Middleware module contains Express middleware functions that handle request 
 #### `authenticate.ts` - Access Token Validation
 
 ##### Purpose
+
 Validates JWT access tokens using RSA public key verification and attaches decoded user data to the request object.
 
 ##### Export
+
 ```typescript
 export const protect = expressjwt({...})
 ```
 
 ##### Configuration
+
 - **Secret**: RSA public key from `certs/public.pem`
 - **Algorithms**: `['RS256']`
 - **Request Property**: `auth`
 - **Credentials Required**: `true`
 
 ##### Token Extraction Logic
+
 ```typescript
 getToken: (req: Request) => {
-  try {
-    // 1. Check Authorization header
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-      const parts = authHeader.split(' ');
-      if (parts.length === 2 && parts[1] !== 'undefined') {
-        return parts[1]; // Bearer token
-      }
+    try {
+        // 1. Check Authorization header
+        const authHeader = req.headers.authorization;
+        if (authHeader) {
+            const parts = authHeader.split(' ');
+            if (parts.length === 2 && parts[1] !== 'undefined') {
+                return parts[1]; // Bearer token
+            }
+        }
+
+        // 2. Check cookies
+        const { accessToken } = req.cookies as AuthCookie;
+        return accessToken;
+    } catch (err) {
+        // Error logging
     }
-    
-    // 2. Check cookies
-    const { accessToken } = req.cookies as AuthCookie;
-    return accessToken;
-  } catch (err) {
-    // Error logging
-  }
-}
+};
 ```
 
 ##### Request Augmentation
+
 After successful validation, the request object includes:
+
 ```typescript
 req.auth = {
   sub: number,    // User ID
@@ -57,28 +63,33 @@ req.auth = {
 ```
 
 ##### Usage
+
 ```typescript
 authRouter.get('/self', protect, async (req, res) => {
-  await authController.self(req as AuthRequest, res);
+    await authController.self(req as AuthRequest, res);
 });
 ```
 
 #### `validateRefreshToken.ts` - Refresh Token Validation
 
 ##### Purpose
+
 Validates JWT refresh tokens using HMAC verification and database persistence check.
 
 ##### Export
+
 ```typescript
 export default expressjwt({...})
 ```
 
 ##### Configuration
+
 - **Secret**: `CONFIG.REFRESH_TOKEN_SECRET!`
 - **Algorithms**: `['HS256']`
 - **Credentials Required**: `true`
 
 ##### Token Extraction
+
 ```typescript
 getToken(req: Request) {
   const { refreshToken } = req.cookies as AuthCookie;
@@ -90,11 +101,12 @@ getToken(req: Request) {
 ```
 
 ##### Token Revocation Check
+
 ```typescript
 async isRevoked(request: Request, token) {
   try {
     const payload = token.payload as JwtPayload;
-    
+
     // Check if refresh token exists in database
     const refreshToken = await refreshTokenRepository.findOne({
       where: {
@@ -102,7 +114,7 @@ async isRevoked(request: Request, token) {
         user: { id: Number(payload?.sub) } // User ID
       },
     });
-    
+
     // Return true if token doesn't exist (revoked)
     return !refreshToken;
   } catch (err) {
@@ -113,9 +125,10 @@ async isRevoked(request: Request, token) {
 ```
 
 ##### Usage
+
 ```typescript
 authRouter.post('/refresh', validateRefreshToken, async (req, res, next) => {
-  await authController.refresh(req as AuthRequest, res, next);
+    await authController.refresh(req as AuthRequest, res, next);
 });
 ```
 
@@ -124,75 +137,83 @@ authRouter.post('/refresh', validateRefreshToken, async (req, res, next) => {
 #### `validation.ts` - Request Body Validation
 
 ##### Purpose
+
 Validates request bodies against Joi schemas before processing.
 
 ##### Export
+
 ```typescript
 export const validate = (schema: ObjectSchema) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    // Validation logic
-  };
-}
+    return (req: Request, res: Response, next: NextFunction) => {
+        // Validation logic
+    };
+};
 ```
 
 ##### Validation Process
+
 1. Extracts request body
 2. Validates against provided schema
 3. On success: calls `next()`
 4. On failure: sends 400 Bad Request with error details
 
 ##### Usage Example
+
 ```typescript
 authRouter.post(
-  '/register',
-  validate(registerUserSchema),
-  async (req, res, next) => await authController.register(req, res, next),
+    '/register',
+    validate(registerUserSchema),
+    async (req, res, next) => await authController.register(req, res, next),
 );
 ```
 
 ## Middleware Patterns
 
 ### Error Handling Pattern
+
 ```typescript
 try {
-  // Middleware logic
-  return result;
+    // Middleware logic
+    return result;
 } catch (err) {
-  const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-  logger.error('Error description', { error: errorMessage });
-  return true; // or throw error
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Error description', { error: errorMessage });
+    return true; // or throw error
 }
 ```
 
 ### Token Validation Pattern
+
 ```typescript
 export const protect = expressjwt({
-  secret: publicKey,
-  algorithms: ['RS256'],
-  requestProperty: 'auth',
-  credentialsRequired: true,
-  getToken: (req: Request) => {
-    // Custom token extraction logic
-  },
+    secret: publicKey,
+    algorithms: ['RS256'],
+    requestProperty: 'auth',
+    credentialsRequired: true,
+    getToken: (req: Request) => {
+        // Custom token extraction logic
+    },
 });
 ```
 
 ### Request Validation Pattern
+
 ```typescript
 export const validate = (schema: ObjectSchema) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const { error } = schema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
-    next();
-  };
+    return (req: Request, res: Response, next: NextFunction) => {
+        const { error } = schema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ error: error.details[0].message });
+        }
+        next();
+    };
 };
 ```
 
 ## Request Flow
 
 ### Protected Route Request Flow
+
 1. **Request arrives** at protected endpoint
 2. **Authentication middleware** validates access token
 3. **Token verification** using RSA public key
@@ -201,6 +222,7 @@ export const validate = (schema: ObjectSchema) => {
 6. **Response** sent to client
 
 ### Refresh Token Request Flow
+
 1. **Request arrives** at refresh endpoint
 2. **Refresh token middleware** extracts token from cookies
 3. **Token verification** using HMAC secret
@@ -214,6 +236,7 @@ export const validate = (schema: ObjectSchema) => {
 ## Security Features
 
 ### Token Security
+
 - **RSA Asymmetric Encryption**: Access tokens use public/private key pairs
 - **HMAC Symmetric Encryption**: Refresh tokens use shared secrets
 - **Token Expiration**: Appropriate expiration times for different token types
@@ -221,6 +244,7 @@ export const validate = (schema: ObjectSchema) => {
 - **Database Validation**: Refresh tokens validated against database records
 
 ### Request Security
+
 - **HTTP-Only Cookies**: Tokens stored in secure cookies
 - **Bearer Token Support**: Authorization header support for APIs
 - **Credential Requirements**: Configurable credential requirements
@@ -229,40 +253,48 @@ export const validate = (schema: ObjectSchema) => {
 ## Configuration Requirements
 
 ### Environment Variables
+
 - `REFRESH_TOKEN_SECRET`: Secret for refresh token HMAC signing
 
 ### File System Requirements
+
 - `certs/public.pem`: RSA public key for access token verification
 - `certs/private.pem`: RSA private key for access token signing
 
 ### Database Requirements
+
 - RefreshTokens table for token persistence and revocation
 
 ## Error Handling
 
 ### Common Error Responses
+
 - **401 Unauthorized**: Missing, invalid, or expired tokens
 - **400 Bad Request**: Invalid request body validation
 - **403 Forbidden**: Insufficient permissions
 - **500 Internal Server Error**: System or database errors
 
 ### Error Logging
+
 All middleware includes comprehensive error logging:
+
 ```typescript
 logger.error('Error description', {
-  error: errorMessage,
-  additionalContext: data
+    error: errorMessage,
+    additionalContext: data,
 });
 ```
 
 ## Performance Considerations
 
 ### Token Verification
+
 - **Public Key Caching**: Public key read once at startup
 - **Database Indexing**: RefreshToken table indexed for fast lookups
 - **Connection Pooling**: Database connections reused efficiently
 
 ### Memory Usage
+
 - **Minimal State**: Middleware maintains minimal in-memory state
 - **Efficient Parsing**: JWT parsing optimized for performance
 - **Garbage Collection**: Proper cleanup of unused objects
@@ -270,6 +302,7 @@ logger.error('Error description', {
 ## Testing
 
 Middleware is tested via integration tests that:
+
 - Test token validation scenarios
 - Verify error handling
 - Test request augmentation
@@ -279,6 +312,7 @@ Middleware is tested via integration tests that:
 ## Future Middleware
 
 The module is designed to accommodate additional middleware:
+
 - `rateLimiter.ts`: API rate limiting
 - `corsHandler.ts`: CORS configuration
 - `requestLogger.ts`: Request/response logging

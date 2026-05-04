@@ -9,116 +9,122 @@ The Authentication module handles user registration, login, token management, an
 ### Components
 
 1. **AuthController** (`src/controllers/AuthController.ts`)
-   - Handles HTTP requests for authentication endpoints
-   - Manages user registration, login, self-profile, and token refresh
+    - Handles HTTP requests for authentication endpoints
+    - Manages user registration, login, self-profile, and token refresh
 
 2. **TokenService** (`src/services/TokenService.ts`)
-   - Generates and validates JWT tokens
-   - Manages refresh token persistence and deletion
-   - Handles RSA key pair for token signing
+    - Generates and validates JWT tokens
+    - Manages refresh token persistence and deletion
+    - Handles RSA key pair for token signing
 
 3. **UserService** (`src/services/UserService.ts`)
-   - Manages user CRUD operations
-   - Handles password hashing and verification
-   - Integrates with CredentialService for password management
+    - Manages user CRUD operations
+    - Handles password hashing and verification
+    - Integrates with CredentialService for password management
 
 4. **Middleware**
-   - `authenticate.ts` - Validates access tokens using public key verification
-   - `validateRefreshToken.ts` - Validates refresh tokens against database
+    - `authenticate.ts` - Validates access tokens using public key verification
+    - `validateRefreshToken.ts` - Validates refresh tokens against database
 
 ## API Endpoints
 
 ### POST `/auth/register`
+
 - **Description**: Register a new user
-- **Body**: 
-  ```json
-  {
-    "firstName": "string",
-    "lastName": "string", 
-    "email": "string",
-    "password": "string"
-  }
-  ```
-- **Response**: 
-  ```json
-  {
-    "id": "number"
-  }
-  ```
+- **Body**:
+    ```json
+    {
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string",
+        "password": "string"
+    }
+    ```
+- **Response**:
+    ```json
+    {
+        "id": "number"
+    }
+    ```
 - **Cookies**: Sets `accessToken` and `refreshToken` HTTP-only cookies
 
 ### POST `/auth/login`
+
 - **Description**: Authenticate user and issue tokens
 - **Body**:
-  ```json
-  {
-    "email": "string",
-    "password": "string"
-  }
-  ```
-- **Response**: 
-  ```json
-  {
-    "id": "number"
-  }
-  ```
+    ```json
+    {
+        "email": "string",
+        "password": "string"
+    }
+    ```
+- **Response**:
+    ```json
+    {
+        "id": "number"
+    }
+    ```
 - **Cookies**: Sets `accessToken` and `refreshToken` HTTP-only cookies
 
 ### GET `/auth/self`
+
 - **Description**: Get current user profile
 - **Authentication**: Requires valid access token
-- **Response**: 
-  ```json
-  {
-    "id": "number",
-    "firstName": "string",
-    "lastName": "string",
-    "email": "string",
-    "role": "string"
-  }
-  ```
+- **Response**:
+    ```json
+    {
+        "id": "number",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string",
+        "role": "string"
+    }
+    ```
 
 ### POST `/auth/refresh`
+
 - **Description**: Refresh access token using refresh token
 - **Authentication**: Requires valid refresh token cookie
-- **Response**: 
-  ```json
-  {
-    "id": "number"
-  }
-  ```
+- **Response**:
+    ```json
+    {
+        "id": "number"
+    }
+    ```
 - **Cookies**: Updates `accessToken` and `refreshToken` cookies
 
 ## Token Management
 
 ### Access Token
+
 - **Algorithm**: RS256
 - **Expiration**: 1 hour
-- **Payload**: 
-  ```json
-  {
-    "sub": "user_id",
-    "role": "user_role",
-    "iat": "timestamp",
-    "exp": "timestamp",
-    "iss": "auth-service"
-  }
-  ```
+- **Payload**:
+    ```json
+    {
+        "sub": "user_id",
+        "role": "user_role",
+        "iat": "timestamp",
+        "exp": "timestamp",
+        "iss": "auth-service"
+    }
+    ```
 
 ### Refresh Token
+
 - **Algorithm**: HS256
 - **Expiration**: 1 year
 - **Payload**:
-  ```json
-  {
-    "sub": "user_id",
-    "role": "user_role",
-    "jti": "token_id",
-    "iat": "timestamp",
-    "exp": "timestamp",
-    "iss": "auth-service"
-  }
-  ```
+    ```json
+    {
+        "sub": "user_id",
+        "role": "user_role",
+        "jti": "token_id",
+        "iat": "timestamp",
+        "exp": "timestamp",
+        "iss": "auth-service"
+    }
+    ```
 
 ## Security Features
 
@@ -131,16 +137,19 @@ The Authentication module handles user registration, login, token management, an
 ## Configuration
 
 ### Environment Variables
+
 - `REFRESH_TOKEN_SECRET`: Secret for refresh token signing
 - `JWKS_URI`: JWKS endpoint (not used in current implementation)
 
 ### Certificates
+
 - `certs/private.pem`: RSA private key for access token signing
 - `certs/public.pem`: RSA public key for access token verification
 
 ## Database Schema
 
 ### RefreshToken Entity
+
 ```typescript
 {
   id: number,           // Primary key
@@ -154,16 +163,18 @@ The Authentication module handles user registration, login, token management, an
 ## Error Handling
 
 ### Common Errors
+
 - **401 Unauthorized**: Invalid credentials, missing/invalid tokens
 - **404 Not Found**: User not found during refresh
 - **409 Conflict**: Email already exists during registration
 - **500 Internal Server Error**: Database or system errors
 
 ### Error Response Format
+
 ```json
 {
-  "error": "error_message",
-  "statusCode": "number"
+    "error": "error_message",
+    "statusCode": "number"
 }
 ```
 
@@ -184,7 +195,7 @@ The Authentication module handles user registration, login, token management, an
 POST /auth/register
 {
   "firstName": "John",
-  "lastName": "Doe", 
+  "lastName": "Doe",
   "email": "john@example.com",
   "password": "securePassword123"
 }
@@ -201,6 +212,7 @@ Headers: Cookie: refreshToken=<jwt_token>
 ## Testing
 
 The module includes comprehensive tests covering:
+
 - User registration and login flows
 - Token validation and refresh
 - Error scenarios
