@@ -11,6 +11,7 @@ import { RefreshToken } from '../entity/RefreshToken';
 import { TokenService } from '../services/TokenService';
 import { AuthRequest } from '../types';
 import { protect } from '../middleware/authenticate';
+import validateRefreshToken from '../middleware/validateRefreshToken';
 
 const authRouter = Router();
 const userRepository = AppDataSource.getRepository(User);
@@ -32,6 +33,9 @@ authRouter.post('/login', validate(loginUserSchema), async (req, res, next) => {
 
 authRouter.get('/self', protect, async (req, res) => {
     await authController.self(req as AuthRequest, res);
+});
+authRouter.post('/refresh', validateRefreshToken, async (req, res, next) => {
+    await authController.refresh(req as AuthRequest, res, next);
 });
 
 export default authRouter;

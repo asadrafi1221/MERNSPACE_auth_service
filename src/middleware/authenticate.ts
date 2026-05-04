@@ -1,29 +1,43 @@
 // src/middleware/protect.ts
 import { expressjwt, Request } from 'express-jwt';
-import JwksClient, { GetVerificationKey } from 'jwks-rsa';
-import { CONFIG } from '../config';
+import fs from 'fs';
+import path from 'path';
+import { AuthCookie } from '../types';
+import logger from '../config/logger';
+
+// Read public key directly instead of using JWKS
+const publicKey = fs.readFileSync(
+    path.join(__dirname, '../../certs/public.pem'),
+);
 
 export const protect = expressjwt({
-    secret: JwksClient.expressJwtSecret({
-        jwksUri: CONFIG.JWKS_URI!,
-        cache: true,
-        rateLimit: true,
-    }) as GetVerificationKey,
-    algorithms: ['RS256', 'HS256'],
+    secret: publicKey,
+    algorithms: ['RS256'],
     requestProperty: 'auth',
     credentialsRequired: true,
     getToken: (req: Request) => {
-        const authHeader = req.headers.authorization;
-        if (authHeader) {
-            const parts = authHeader.split(' ');
-            if (parts.length === 2 && parts[1] !== 'undefined') {
-                return parts[1];
+        try {
+            const authHeader = req.headers.authorization;
+            console.log('parts mate : ', authHeader);
+
+            if (authHeader) {
+                const parts = authHeader.split(' ');
+
+                if (parts.length === 2 && parts[1] !== 'undefined') {
+                    return parts[1];
+                }
             }
+
+            const { accessToken } = req.cookies as AuthCookie;
+
+            console.log('accessToken : ', accessToken);
+            return accessToken;
+        } catch (err) {
+            const errorMessage =
+                err instanceof Error ? err.message : 'Unknown error';
+            logger.error('Error while validating the refreshToken', {
+                error: errorMessage,
+            });
         }
-        type AccessToken = {
-            accessToken: string;
-        };
-        const { accessToken } = req.cookies as AccessToken;
-        return accessToken;
     },
 });

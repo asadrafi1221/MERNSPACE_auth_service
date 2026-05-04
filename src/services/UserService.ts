@@ -12,13 +12,15 @@ export class UserService {
         private credentialService: CredentialService,
     ) {}
 
+    get credentialServiceInstance() {
+        return this.credentialService;
+    }
+
     async create({ firstName, lastName, email, password }: UserData) {
         const hashpassword =
             await this.credentialService.hashPassword(password);
 
-        const userExisted = await this.userRepository.findOne({
-            where: { email },
-        });
+        const userExisted = await this.findByEmail(email);
 
         if (userExisted) {
             const error = createHttpError(400, 'Email alreadys exist');
@@ -43,28 +45,12 @@ export class UserService {
         }
     }
 
-    async login({ email, password }: { email: string; password: string }) {
-        const user = await this.userRepository.findOne({
+    async findByEmail(email: string) {
+        return await this.userRepository.findOne({
             where: { email },
         });
-
-        if (!user) {
-            const error = createHttpError(401, 'Invalid credentials');
-            throw error;
-        }
-
-        const isPasswordValid = await this.credentialService.comparePassword(
-            password,
-            user.password,
-        );
-
-        if (!isPasswordValid) {
-            const error = createHttpError(401, 'Invalid credentials');
-            throw error;
-        }
-
-        return user;
     }
+
     async findById(id: number) {
         return await this.userRepository.findOne({
             where: {
