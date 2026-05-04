@@ -49,7 +49,7 @@ export class AuthController {
                 id: user?.id,
             });
 
-            res.json({ id: user?.id });
+            res.status(201).json({ id: user?.id });
         } catch (err) {
             next(err);
             return;
@@ -103,8 +103,6 @@ export class AuthController {
         }
     }
     async self(req: AuthRequest, res: Response) {
-        console.log('Come Here : ', req?.auth?.sub);
-
         const user = await this.userService.findById(Number(req?.auth?.sub));
 
         res.json({ ...user, password: undefined });

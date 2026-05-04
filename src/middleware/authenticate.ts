@@ -18,7 +18,6 @@ export const protect = expressjwt({
     getToken: (req: Request) => {
         try {
             const authHeader = req.headers.authorization;
-            console.log('parts mate : ', authHeader);
 
             if (authHeader) {
                 const parts = authHeader.split(' ');
@@ -30,7 +29,6 @@ export const protect = expressjwt({
 
             const { accessToken } = req.cookies as AuthCookie;
 
-            console.log('accessToken : ', accessToken);
             return accessToken;
         } catch (err) {
             const errorMessage =

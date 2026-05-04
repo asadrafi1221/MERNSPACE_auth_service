@@ -2,20 +2,8 @@
 module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
-    roots: ['<rootDir>'],
+    roots: ['<rootDir>/src'],
     testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-    extensionsToTreatAsEsm: ['.ts'],
-    transform: {
-        '^.+\\.ts$': [
-            'ts-jest',
-            {
-                useESM: true,
-                tsconfig: {
-                    module: 'ESNext',
-                },
-            },
-        ],
-    },
     moduleNameMapper: {
         '^jwks-rsa$': '<rootDir>/src/__mocks__/jwks-rsa.ts',
         '^jose$': '<rootDir>/src/__mocks__/jose.ts',
@@ -23,4 +11,7 @@ module.exports = {
     },
     transformIgnorePatterns: ['node_modules/(?!(jose|jwks-rsa|express-jwt)/)'],
     collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts'],
+    setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+    moduleFileExtensions: ['ts', 'js', 'json'],
+    testPathIgnorePatterns: ['/node_modules/', '/dist/'],
 };

@@ -7,7 +7,7 @@ interface JWTPayload {
 
 interface AuthenticatedRequest extends Request {
     auth: {
-        id: number;
+        sub: string;
         role: string;
     };
 }
@@ -37,7 +37,7 @@ export const expressjwt = jest.fn(
                 return next(error);
             }
 
-            let userId = 1;
+            let userSub = '1';
             let role = 'customer';
 
             if (cookieToken) {
@@ -49,7 +49,7 @@ export const expressjwt = jest.fn(
                         const payload = JSON.parse(
                             Buffer.from(parts[1], 'base64').toString(),
                         ) as JWTPayload;
-                        userId = parseInt(payload.sub, 10) || 1;
+                        userSub = payload.sub || '1';
                         role = payload.role || 'customer';
                     }
                 } catch {
@@ -64,16 +64,16 @@ export const expressjwt = jest.fn(
                         return next(jwtError);
                     }
                     // Fallback to default
-                    userId = 1;
+                    userSub = '1';
                     role = 'customer';
                 }
             } else if (!options.credentialsRequired) {
                 // If no token but credentials not required, set default
-                (req as AuthenticatedRequest).auth = { id: userId, role };
+                (req as AuthenticatedRequest).auth = { sub: userSub, role };
             }
 
             if (cookieToken || !options.credentialsRequired) {
-                (req as AuthenticatedRequest).auth = { id: userId, role };
+                (req as AuthenticatedRequest).auth = { sub: userSub, role };
             }
             next();
         },
