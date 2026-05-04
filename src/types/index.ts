@@ -38,3 +38,7 @@ export interface ITenantPayload {
     name: string;
     adress: string;
 }
+
+export interface CreateTenantRequest extends Request {
+    body: ITenantPayload;
+}

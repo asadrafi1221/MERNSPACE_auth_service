@@ -4,6 +4,7 @@ import app from '../../app';
 import request from 'supertest';
 import { truncateTables } from '../utils';
 import { ITenantPayload } from '../../types';
+import { Tenant } from '../../entity/Tenant';
 
 describe('POST /create/tenant', () => {
     let connection: DataSource;
@@ -28,16 +29,28 @@ describe('POST /create/tenant', () => {
         return response;
     }
 
+    async function asserData() {
+        const payload: ITenantPayload = {
+            name: 'Tenant Name ',
+            adress: 'Tenant adress',
+        };
+
+        const response = await callApi(payload);
+        return response;
+    }
+
     describe('Given all fields', () => {
         it('should return 201 status code', async () => {
-            const payload: ITenantPayload = {
-                name: 'Tenant Name ',
-                adress: 'Tenant adress',
-            };
-
-            const response = await callApi(payload);
+            const response = await asserData();
+            expect(response.statusCode).toBe(201);
+        });
+        it('should store tenant in the databse', async () => {
+            const response = await asserData();
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.find();
 
             expect(response.statusCode).toBe(201);
+            expect(tenant).toHaveLength(1);
         });
     });
 
