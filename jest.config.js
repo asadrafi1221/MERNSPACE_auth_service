@@ -14,4 +14,8 @@ module.exports = {
     setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
     moduleFileExtensions: ['ts', 'js', 'json'],
     testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+    coverageProvider: 'v8',
+    coverageCollector: true,
+    verbose: true,
+    collectCoverageFrom: ['src/**/*.ts', '!tests/**', '!**/node_modules/**'],
 };
