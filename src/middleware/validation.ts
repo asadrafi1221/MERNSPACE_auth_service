@@ -6,7 +6,7 @@ export const validate = <T = any>(schema: Schema) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const validationResult = schema.validate(req.body, {
             abortEarly: false,
-            stripUnknown: true,
+            stripUnknown: false,
         });
 
         if (validationResult.error) {

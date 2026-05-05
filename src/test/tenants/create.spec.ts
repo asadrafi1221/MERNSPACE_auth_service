@@ -96,20 +96,26 @@ describe('POST /create/tenant', () => {
         });
     });
 
-    // describe('Given missing fields', () => {
-    //     it('should return 400 status code if any field is missing', async () => {
-    //         const tenantData = {
-    //             name: 'Tenant Name',
-    //             // missing 'address' field
-    //         };
+    describe('Given missing fields', () => {
+        it('should return 400 status code if any field is missing', async () => {
+            const payload = {
+                name: 'Tenant Name',
+                // missing 'address' field
+            };
 
-    //         //Act
-    //         const response = await request(app)
-    //             .post('/tenants/create')
-    //             .send(tenantData);
+            //Act
+            const adminAccessToken = jwks.token({
+                sub: '1',
+                role: Roles.ADMIN,
+            });
 
-    //         // Assert
-    //         expect(response.statusCode).toBe(400);
-    //     });
-    // });
+            const response = await request(app)
+                .post('/tenants/create')
+                .set('Cookie', [`accessToken=${adminAccessToken}`])
+                .send(payload);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+        });
+    });
 });
