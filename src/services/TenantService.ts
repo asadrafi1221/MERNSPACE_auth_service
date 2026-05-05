@@ -5,10 +5,10 @@ import { Tenant } from '../entity/Tenant';
 export class TenantService {
     constructor(private tenantRepository: Repository<Tenant>) {}
 
-    async create({ name, adress }: ITenantPayload) {
+    async create({ name, address }: ITenantPayload) {
         return await this.tenantRepository.save({
             name,
-            adress,
+            address,
         });
     }
     async getTenants() {

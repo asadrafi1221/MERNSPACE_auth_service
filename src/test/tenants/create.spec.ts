@@ -44,7 +44,7 @@ describe('POST /create/tenant', () => {
     async function asserData() {
         const payload: ITenantPayload = {
             name: 'Tenant Name ',
-            adress: 'Tenant adress',
+            address: 'Tenant address',
         };
 
         const response = await callApi(payload);
@@ -67,7 +67,7 @@ describe('POST /create/tenant', () => {
         it('should return 401 status if user not logged in', async () => {
             const payload: ITenantPayload = {
                 name: 'Tenant Name ',
-                adress: 'Tenant adress',
+                address: 'Tenant address',
             };
 
             const response = await request(app)
@@ -84,7 +84,7 @@ describe('POST /create/tenant', () => {
 
             const payload: ITenantPayload = {
                 name: 'Tenant Name ',
-                adress: 'Tenant adress',
+                address: 'Tenant address',
             };
 
             const response = await request(app)

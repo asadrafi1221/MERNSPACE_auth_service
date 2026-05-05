@@ -16,7 +16,7 @@ export class UserService {
         return this.credentialService;
     }
 
-    async create({ firstName, lastName, email, password }: UserData) {
+    async create({ firstName, lastName, email, password, tenantId }: UserData) {
         const hashpassword =
             await this.credentialService.hashPassword(password);
 
@@ -33,6 +33,7 @@ export class UserService {
                 email,
                 password: hashpassword,
                 role: Roles.CUSTOMER,
+                tenant: tenantId ? { id: tenantId } : undefined,
             });
 
             return user;

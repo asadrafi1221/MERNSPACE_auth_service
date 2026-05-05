@@ -17,7 +17,7 @@ export class Tenant {
     name!: string;
 
     @Column('varchar', { length: 100 })
-    adress!: string;
+    address!: string;
 
     @CreateDateColumn()
     createdAt!: Date;

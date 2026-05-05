@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { DataSource } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Tenant } from '../../entity/Tenant';
 
 export const truncateTables = async (connection: DataSource) => {
     const entities = connection.entityMetadatas;
@@ -16,6 +17,18 @@ export const truncateTables = async (connection: DataSource) => {
 
     // Re-enable foreign key constraints
     await connection.query('SET session_replication_role = DEFAULT;');
+};
+
+export const createTenant = async (
+    tenantRepository: Repository<Tenant>,
+    name: string,
+    address: string,
+): Promise<Tenant> => {
+    const tenant = await tenantRepository.save({
+        name,
+        address,
+    });
+    return tenant;
 };
 
 export const isJwt = (token: string | null): boolean => {

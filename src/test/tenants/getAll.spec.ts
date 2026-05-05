@@ -79,9 +79,9 @@ describe('GET /tenants', () => {
             });
 
             const tenants: ITenantPayload[] = [
-                { name: 'Tenant 1', adress: 'Address 1' },
-                { name: 'Tenant 2', adress: 'Address 2' },
-                { name: 'Tenant 3', adress: 'Address 3' },
+                { name: 'Tenant 1', address: 'Address 1' },
+                { name: 'Tenant 2', address: 'Address 2' },
+                { name: 'Tenant 3', address: 'Address 3' },
             ];
 
             // Create tenants
@@ -101,7 +101,7 @@ describe('GET /tenants', () => {
             const responseBody = response.body as { tenants: Tenant[] };
             expect(responseBody.tenants).toHaveLength(3);
             expect(responseBody.tenants[0]).toHaveProperty('name');
-            expect(responseBody.tenants[0]).toHaveProperty('adress');
+            expect(responseBody.tenants[0]).toHaveProperty('address');
             expect(responseBody.tenants[0]).toHaveProperty('id');
         });
     });

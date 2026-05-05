@@ -33,7 +33,7 @@ describe('PATCH /tenant/update', () => {
             // First create a tenant
             const createPayload: ITenantPayload = {
                 name: 'Original Name',
-                adress: 'Original Address',
+                address: 'Original Address',
             };
 
             const adminAccessToken = jwks.token({
@@ -51,7 +51,7 @@ describe('PATCH /tenant/update', () => {
             // Then update it
             const updatePayload: ITenantPayload = {
                 name: 'See bro',
-                adress: 'Make this',
+                address: 'Make this',
             };
 
             const updateResponse: Response = await request(app)
@@ -64,7 +64,7 @@ describe('PATCH /tenant/update', () => {
         it('should return 401 status if user not logged in', async () => {
             const payload: ITenantPayload = {
                 name: 'Tenant Name ',
-                adress: 'Tenant adress',
+                address: 'Tenant address',
             };
 
             const response = await request(app)
@@ -81,7 +81,7 @@ describe('PATCH /tenant/update', () => {
 
             const payload: ITenantPayload = {
                 name: 'Tenant Name ',
-                adress: 'Tenant adress',
+                address: 'Tenant address',
             };
 
             const response = await request(app)
@@ -95,7 +95,7 @@ describe('PATCH /tenant/update', () => {
             // First create a tenant
             const createPayload: ITenantPayload = {
                 name: 'Original Name',
-                adress: 'Original Address',
+                address: 'Original Address',
             };
 
             const adminAccessToken = jwks.token({
@@ -113,7 +113,7 @@ describe('PATCH /tenant/update', () => {
             // Then update it
             const updatePayload: ITenantPayload = {
                 name: 'See bro',
-                adress: 'Make this',
+                address: 'Make this',
             };
 
             const updateResponse: Response = await request(app)
@@ -130,7 +130,7 @@ describe('PATCH /tenant/update', () => {
 
             expect(tenant).toBeTruthy();
             expect(tenant!.name).toBe(updatePayload.name);
-            expect(tenant!.adress).toBe(updatePayload.adress);
+            expect(tenant!.address).toBe(updatePayload.address);
         });
     });
 
@@ -138,7 +138,7 @@ describe('PATCH /tenant/update', () => {
         it('should return 400 status code if any wrong fields are passed', async () => {
             const createPayload: ITenantPayload = {
                 name: 'Original Name',
-                adress: 'Original Address',
+                address: 'Original Address',
             };
 
             const adminAccessToken = jwks.token({
@@ -156,7 +156,7 @@ describe('PATCH /tenant/update', () => {
             // Then update it
             const updatePayload = {
                 ishaq: 'See bro',
-                adress: 'Make this',
+                address: 'Make this',
             };
 
             const updateResponse: Response = await request(app)

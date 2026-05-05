@@ -64,7 +64,7 @@ describe('GET /tenants/:id', () => {
 
             const createPayload: ITenantPayload = {
                 name: 'Test Tenant',
-                adress: 'Test Address',
+                address: 'Test Address',
             };
 
             const createResponse = await request(app)
@@ -87,8 +87,8 @@ describe('GET /tenants/:id', () => {
                 createPayload.name,
             );
             expect(responseBody.tenant).toHaveProperty(
-                'adress',
-                createPayload.adress,
+                'address',
+                createPayload.address,
             );
         });
 

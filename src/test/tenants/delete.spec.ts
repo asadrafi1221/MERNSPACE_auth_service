@@ -33,7 +33,7 @@ describe('DELETE /tenant/delete', () => {
             // First create a tenant
             const createPayload: ITenantPayload = {
                 name: 'Test Tenant',
-                adress: 'Test Address',
+                address: 'Test Address',
             };
 
             const adminAccessToken = jwks.token({
@@ -60,7 +60,7 @@ describe('DELETE /tenant/delete', () => {
             // First create a tenant
             const createPayload: ITenantPayload = {
                 name: 'Test Tenant',
-                adress: 'Test Address',
+                address: 'Test Address',
             };
 
             const adminAccessToken = jwks.token({

@@ -12,11 +12,11 @@ export class TenantController {
 
     async create(req: CreateTenantRequest, res: Response, next: NextFunction) {
         try {
-            const { name, adress } = req.body;
+            const { name, address } = req.body;
 
             const tenant = await this.tenantService.create({
                 name,
-                adress,
+                address,
             });
 
             this.logger.info('Tenant has been created');
@@ -30,7 +30,7 @@ export class TenantController {
     }
     async update(req: CreateTenantRequest, res: Response, next: NextFunction) {
         try {
-            const { name, adress } = req.body;
+            const { name, address } = req.body;
             const tenantId = parseInt((req.params.id as string) || '1');
 
             if (isNaN(tenantId)) {
@@ -40,7 +40,7 @@ export class TenantController {
 
             await this.tenantService.updateTenant(tenantId, {
                 name,
-                adress,
+                address,
             });
 
             this.logger.info('Tenant has been updated');

@@ -5,6 +5,7 @@ export interface UserData {
     lastName: string;
     email: string;
     password: string;
+    tenantId?: number;
 }
 export interface RegisterUserRequest extends Request {
     body: UserData;
@@ -36,7 +37,7 @@ export interface IRefreshTokenPayload {
 }
 export interface ITenantPayload {
     name: string;
-    adress: string;
+    address: string;
 }
 
 export interface CreateTenantRequest extends Request {
