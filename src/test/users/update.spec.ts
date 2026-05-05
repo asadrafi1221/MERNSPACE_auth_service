@@ -7,6 +7,7 @@ import { UserData } from '../../types';
 import createJWKSMock from 'mock-jwks';
 import { Roles } from '../../constants';
 import { User } from '../../entity/User';
+import { Tenant } from '../../entity/Tenant';
 
 describe('PATCH /users/update/:id', () => {
     let connection: DataSource;
@@ -108,6 +109,109 @@ describe('PATCH /users/update/:id', () => {
             expect(user!.firstName).toBe(updatePayload.firstName);
             expect(user!.lastName).toBe(updatePayload.lastName);
             expect(user!.email).toBe(updatePayload.email);
+        });
+
+        it('should update user with tenantId and role', async () => {
+            // First create a user
+            const createPayload: UserData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                password: 'password123',
+            };
+
+            const adminAccessToken = jwks.token({
+                sub: '1',
+                role: Roles.ADMIN,
+            });
+
+            const createResponse: Response = await request(app)
+                .post('/users/create')
+                .set('Cookie', [`accessToken=${adminAccessToken}`])
+                .send(createPayload);
+
+            const userId = (createResponse.body as { id: number }).id;
+
+            // Create a tenant for testing
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: 'Test Tenant',
+                address: 'Test Address',
+            });
+
+            // Then update user with tenantId and role
+            const updatePayload = {
+                role: 'manager',
+                tenantId: tenant.id,
+            };
+
+            const updateResponse: Response = await request(app)
+                .post(`/users/update/${userId}`)
+                .set('Cookie', [`accessToken=${adminAccessToken}`])
+                .send(updatePayload);
+
+            expect(updateResponse.statusCode).toBe(200);
+
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.findOne({
+                where: { id: userId },
+                relations: ['tenant'],
+            });
+
+            expect(user).toBeTruthy();
+            expect(user!.role).toBe(updatePayload.role);
+            expect(user!.tenant?.id).toBe(tenant.id);
+            expect(user!.tenant?.name).toBe(tenant.name);
+        });
+
+        it('should update user and remove tenant association', async () => {
+            // First create a tenant and user with tenant
+            const tenantRepository = connection.getRepository(Tenant);
+            const tenant = await tenantRepository.save({
+                name: 'Test Tenant',
+                address: 'Test Address',
+            });
+
+            const createPayload: UserData = {
+                firstName: 'John',
+                lastName: 'Doe',
+                email: 'john.doe@example.com',
+                password: 'password123',
+                tenantId: tenant.id,
+            };
+
+            const adminAccessToken = jwks.token({
+                sub: '1',
+                role: Roles.ADMIN,
+            });
+
+            const createResponse: Response = await request(app)
+                .post('/users/create')
+                .set('Cookie', [`accessToken=${adminAccessToken}`])
+                .send(createPayload);
+
+            const userId = (createResponse.body as { id: number }).id;
+
+            // Then update user to remove tenant
+            const updatePayload = {
+                tenantId: null,
+            };
+
+            const updateResponse: Response = await request(app)
+                .post(`/users/update/${userId}`)
+                .set('Cookie', [`accessToken=${adminAccessToken}`])
+                .send(updatePayload);
+
+            expect(updateResponse.statusCode).toBe(200);
+
+            const userRepository = connection.getRepository(User);
+            const user = await userRepository.findOne({
+                where: { id: userId },
+                relations: ['tenant'],
+            });
+
+            expect(user).toBeTruthy();
+            expect(user!.tenant).toBeNull();
         });
     });
 

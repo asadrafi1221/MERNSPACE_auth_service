@@ -13,13 +13,16 @@ export class UserController {
 
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
         try {
-            const { firstName, lastName, email, password } = req.body;
+            const { firstName, lastName, email, password, tenantId, role } =
+                req.body;
 
             const user = await this.userService.create({
                 firstName,
                 lastName,
                 email,
                 password,
+                tenantId,
+                role,
             });
 
             this.logger.info('User has been created');
@@ -34,7 +37,8 @@ export class UserController {
 
     async update(req: UpdateUserRequest, res: Response, next: NextFunction) {
         try {
-            const { firstName, lastName, email, password, role } = req.body;
+            const { firstName, lastName, email, password, role, tenantId } =
+                req.body;
             const userId = parseInt((req.params.id as string) || '1');
 
             if (isNaN(userId)) {
@@ -48,6 +52,7 @@ export class UserController {
                 email,
                 password,
                 role,
+                tenantId,
             });
 
             this.logger.info('User has been updated');

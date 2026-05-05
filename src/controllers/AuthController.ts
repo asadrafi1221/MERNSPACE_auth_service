@@ -138,7 +138,7 @@ export class AuthController {
 
             setTokenCookies(res, accessToken, refreshToken);
 
-            this.logger.info('User has been logged in', {
+            this.logger.info('User has been logged in : ', {
                 id: user?.id,
             });
 

@@ -64,6 +64,17 @@ export const createUserSchema = Joi.object({
         'string.max': 'Password must not exceed 128 characters',
         'any.required': 'Password is required',
     }),
+    tenantId: Joi.number().integer().positive().optional().messages({
+        'number.base': 'Tenant ID must be a number',
+        'number.integer': 'Tenant ID must be an integer',
+        'number.positive': 'Tenant ID must be a positive number',
+    }),
+    role: Joi.string()
+        .valid('customer', 'admin', 'manager')
+        .optional()
+        .messages({
+            'any.only': 'Role must be one of: customer, admin, manager',
+        }),
 });
 
 export const updateUserSchema = Joi.object({
@@ -87,5 +98,15 @@ export const updateUserSchema = Joi.object({
         .optional()
         .messages({
             'any.only': 'Role must be one of: customer, admin, manager',
+        }),
+    tenantId: Joi.number()
+        .integer()
+        .positive()
+        .allow(null)
+        .optional()
+        .messages({
+            'number.base': 'Tenant ID must be a number',
+            'number.integer': 'Tenant ID must be an integer',
+            'number.positive': 'Tenant ID must be a positive number',
         }),
 });

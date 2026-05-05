@@ -6,6 +6,7 @@ export interface UserData {
     email: string;
     password: string;
     tenantId?: number;
+    role?: string;
 }
 export interface RegisterUserRequest extends Request {
     body: UserData;
@@ -54,6 +55,7 @@ export interface UpdateUserData {
     email?: string;
     password?: string;
     role?: string;
+    tenantId?: number;
 }
 
 export interface UpdateUserRequest extends Request {

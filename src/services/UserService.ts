@@ -16,7 +16,14 @@ export class UserService {
         return this.credentialService;
     }
 
-    async create({ firstName, lastName, email, password, tenantId }: UserData) {
+    async create({
+        firstName,
+        lastName,
+        email,
+        password,
+        tenantId,
+        role,
+    }: UserData) {
         const hashpassword =
             await this.credentialService.hashPassword(password);
 
@@ -32,7 +39,7 @@ export class UserService {
                 lastName,
                 email,
                 password: hashpassword,
-                role: Roles.CUSTOMER,
+                role: role || Roles.CUSTOMER,
                 tenant: tenantId ? { id: tenantId } : undefined,
             });
 
@@ -57,11 +64,18 @@ export class UserService {
             where: {
                 id,
             },
+            relations: {
+                tenant: true,
+            },
         });
     }
 
     async getAllUsers() {
-        return await this.userRepository.find();
+        return await this.userRepository.find({
+            relations: {
+                tenant: true,
+            },
+        });
     }
 
     async updateUser(id: number, updateData: UpdateUserData) {
@@ -87,7 +101,16 @@ export class UserService {
             );
         }
 
-        await this.userRepository.update(id, updateData);
+        // Handle tenantId conversion for database update
+        const { tenantId, ...otherFields } = updateData;
+        const updatePayload: Partial<User> = { ...otherFields };
+
+        if (tenantId !== undefined) {
+            (updatePayload as { tenant?: { id: number } | null }).tenant =
+                tenantId ? { id: tenantId } : null;
+        }
+
+        await this.userRepository.update(id, updatePayload);
         return await this.findById(id);
     }
 
