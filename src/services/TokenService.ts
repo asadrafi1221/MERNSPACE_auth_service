@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { JwtPayload, sign, SignOptions } from 'jsonwebtoken';
 import { Logger } from 'winston';
 import createHttpError from 'http-errors';
@@ -12,15 +14,18 @@ export class TokenService {
         private logger: Logger,
     ) {}
 
-    private readPrivateKey(): string {
-        if (!CONFIG.PRIVATE_KEY) {
+    private readPrivateKey(): Buffer {
+        try {
+            return fs.readFileSync(
+                path.join(__dirname, '../../certs/private.pem'),
+            );
+        } catch {
             const error = createHttpError(
                 500,
-                'PRIVATE_KEY environment variable is not set',
+                'Error while reading private key',
             );
             throw error;
         }
-        return CONFIG.PRIVATE_KEY;
     }
 
     generateAccessToken(payload: JwtPayload): string {
