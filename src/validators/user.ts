@@ -110,3 +110,20 @@ export const updateUserSchema = Joi.object({
             'number.positive': 'Tenant ID must be a positive number',
         }),
 });
+
+export const getAllUsersSchema = Joi.object({
+    page: Joi.number().integer().min(1).default(1).messages({
+        'number.base': 'Page must be a number',
+        'number.integer': 'Page must be an integer',
+        'number.min': 'Page must be at least 1',
+    }),
+    limit: Joi.number().integer().min(1).max(100).default(10).messages({
+        'number.base': 'Limit must be a number',
+        'number.integer': 'Limit must be an integer',
+        'number.min': 'Limit must be at least 1',
+        'number.max': 'Limit cannot exceed 100',
+    }),
+    search: Joi.string().max(100).optional().messages({
+        'string.max': 'Search term cannot exceed 100 characters',
+    }),
+});

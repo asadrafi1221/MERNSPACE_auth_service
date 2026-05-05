@@ -7,8 +7,12 @@ import { CredentialService } from '../services/CredentialService';
 import logger from '../config/logger';
 import { canAccess } from '../middleware/canAccess';
 import { Roles } from '../constants';
-import { validate } from '../middleware/validation';
-import { createUserSchema, updateUserSchema } from '../validators/user';
+import { validate, validateQuery } from '../middleware/validation';
+import {
+    createUserSchema,
+    updateUserSchema,
+    getAllUsersSchema,
+} from '../validators/user';
 
 const userRouter = Router();
 
@@ -35,9 +39,14 @@ userRouter.post(
     },
 );
 
-userRouter.get('/', canAccess([Roles.ADMIN]), async (req, res, next) => {
-    await userController.getAllUsers(req, res, next);
-});
+userRouter.get(
+    '/',
+    validateQuery(getAllUsersSchema),
+    canAccess([Roles.ADMIN]),
+    async (req, res, next) => {
+        await userController.getAllUsers(req, res, next);
+    },
+);
 
 userRouter.get('/:id', canAccess([Roles.ADMIN]), async (req, res, next) => {
     await userController.getUserById(req, res, next);

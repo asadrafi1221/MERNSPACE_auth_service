@@ -70,12 +70,44 @@ export class UserService {
         });
     }
 
-    async getAllUsers() {
-        return await this.userRepository.find({
-            relations: {
-                tenant: true,
+    async getAllUsers(paginationParams?: {
+        page: number;
+        limit: number;
+        search?: string;
+    }) {
+        const { page = 1, limit = 10, search } = paginationParams || {};
+        const offset = (page - 1) * limit;
+
+        const queryBuilder = this.userRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.tenant', 'tenant')
+            .take(limit)
+            .skip(offset)
+            .orderBy('user.id', 'DESC');
+
+        if (search) {
+            queryBuilder.where(
+                '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)',
+                { search: `%${search}%` },
+            );
+        }
+
+        const [users, total] = await queryBuilder.getManyAndCount();
+
+        return {
+            users: users.map((user) => ({
+                ...user,
+                password: undefined,
+            })),
+            pagination: {
+                page,
+                limit,
+                total,
+                totalPages: Math.ceil(total / limit),
+                hasNext: page * limit < total,
+                hasPrev: page > 1,
             },
-        });
+        };
     }
 
     async updateUser(id: number, updateData: UpdateUserData) {

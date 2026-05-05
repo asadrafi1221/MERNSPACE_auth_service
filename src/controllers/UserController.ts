@@ -1,9 +1,12 @@
 import { Response, NextFunction } from 'express';
 import { Logger } from 'winston';
 import { UserService } from '../services/UserService';
-import { CreateUserRequest, UpdateUserRequest } from '../types';
+import {
+    CreateUserRequest,
+    UpdateUserRequest,
+    GetAllUsersRequest,
+} from '../types';
 import createHttpError from 'http-errors';
-import { User } from '../entity/User';
 
 export class UserController {
     constructor(
@@ -66,21 +69,24 @@ export class UserController {
     }
 
     async getAllUsers(
-        req: CreateUserRequest,
+        req: GetAllUsersRequest,
         res: Response,
         next: NextFunction,
     ) {
         try {
-            const users = await this.userService.getAllUsers();
+            const page = parseInt(req.query.page || '1');
+            const limit = parseInt(req.query.limit || '10');
+            const search = req.query.search;
 
-            this.logger.info('Retrieved all users');
-
-            return res.status(200).json({
-                users: users.map((user: User) => ({
-                    ...user,
-                    password: undefined,
-                })),
+            const result = await this.userService.getAllUsers({
+                page,
+                limit,
+                search,
             });
+
+            this.logger.info('Retrieved all users with pagination');
+
+            return res.status(200).json(result);
         } catch (err) {
             next(err);
         }

@@ -61,3 +61,17 @@ export interface UpdateUserData {
 export interface UpdateUserRequest extends Request {
     body: UpdateUserData;
 }
+
+export interface GetAllUsersRequest extends Request {
+    query: {
+        page?: string;
+        limit?: string;
+        search?: string;
+    };
+}
+
+export interface PaginationParams {
+    page: number;
+    limit: number;
+    offset: number;
+}
