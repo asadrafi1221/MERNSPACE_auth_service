@@ -12,11 +12,13 @@ import { Tenant } from '../../entity/Tenant';
 describe('PATCH /users/update/:id', () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
+    const isCI = process.env.CI === 'true';
+    const timeout = isCI ? 60000 : undefined;
 
     beforeAll(async () => {
         jwks = createJWKSMock('http://localhost:4500');
         connection = await AppDataSource.initialize();
-    });
+    }, timeout);
 
     beforeEach(async () => {
         jwks.start();

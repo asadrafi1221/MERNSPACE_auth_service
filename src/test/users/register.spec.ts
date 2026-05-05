@@ -9,10 +9,12 @@ import { RefreshToken } from '../../entity/RefreshToken';
 
 describe('POST /auth/register', () => {
     let connection: DataSource;
+    const isCI = process.env.CI === 'true';
+    const timeout = isCI ? 60000 : undefined;
 
     beforeAll(async () => {
         connection = await AppDataSource.initialize();
-    });
+    }, timeout);
 
     beforeEach(async () => {
         // Database truncate
