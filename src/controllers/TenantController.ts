@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { Logger } from 'winston';
 import { TenantService } from '../services/TenantService';
 import { CreateTenantRequest } from '../types';
+import createHttpError from 'http-errors';
 
 export class TenantController {
     constructor(
@@ -33,9 +34,8 @@ export class TenantController {
             const tenantId = parseInt((req.params.id as string) || '1');
 
             if (isNaN(tenantId)) {
-                return res.status(400).json({
-                    message: 'Invalid tenant ID format',
-                });
+                const error = createHttpError(400, 'Invalid tenant ID format');
+                return next(error);
             }
 
             await this.tenantService.updateTenant(tenantId, {
@@ -58,9 +58,8 @@ export class TenantController {
             const tenantId = parseInt((req.params.id as string) || '1');
 
             if (isNaN(tenantId)) {
-                return res.status(400).json({
-                    message: 'Invalid tenant ID format',
-                });
+                const error = createHttpError(400, 'Invalid tenant ID format');
+                return next(error);
             }
 
             await this.tenantService.deleteTenant(tenantId);
@@ -102,17 +101,15 @@ export class TenantController {
             const tenantId = parseInt((req.params.id as string) || '1');
 
             if (isNaN(tenantId)) {
-                return res.status(400).json({
-                    message: 'Invalid tenant ID format',
-                });
+                const error = createHttpError(400, 'Invalid tenant ID format');
+                return next(error);
             }
 
             const tenant = await this.tenantService.getTenantById(tenantId);
 
             if (!tenant) {
-                return res.status(404).json({
-                    message: 'Tenant not found',
-                });
+                const error = createHttpError(404, 'Tenant not found');
+                return next(error);
             }
 
             this.logger.info(`Retrieved tenant with ID: ${tenantId}`);

@@ -42,3 +42,19 @@ export interface ITenantPayload {
 export interface CreateTenantRequest extends Request {
     body: ITenantPayload;
 }
+
+export interface CreateUserRequest extends Request {
+    body: UserData;
+}
+
+export interface UpdateUserData {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    password?: string;
+    role?: string;
+}
+
+export interface UpdateUserRequest extends Request {
+    body: UpdateUserData;
+}

@@ -3,12 +3,12 @@ import { AppDataSource } from '../../config/data-source';
 import app from '../../app';
 import request from 'supertest';
 import { truncateTables } from '../utils';
-import { ITenantPayload } from '../../types';
+import { UserData } from '../../types';
 import createJWKSMock from 'mock-jwks';
 import { Roles } from '../../constants';
-import { Tenant } from '../../entity/Tenant';
+import { User } from '../../entity/User';
 
-describe('GET /tenants/:id', () => {
+describe('GET /users/:id', () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
 
@@ -36,95 +36,89 @@ describe('GET /tenants/:id', () => {
             });
 
             const response = await request(app)
-                .get('/tenants/1')
+                .get('/users/1')
                 .set('Cookie', [`accessToken=${adminAccessToken}`]);
 
-            expect(response.statusCode).toBe(404); // No tenant exists
+            expect(response.statusCode).toBe(404); // No user exists
         });
 
-        it('should return 200 status code for manager', async () => {
-            const managerAccessToken = jwks.token({
-                sub: '1',
-                role: Roles.MANAGER,
-            });
-
-            const response = await request(app)
-                .get('/tenants/1')
-                .set('Cookie', [`accessToken=${managerAccessToken}`]);
-
-            expect(response.statusCode).toBe(404); // No tenant exists
-        });
-
-        it('should return tenant when valid ID is provided', async () => {
-            // Create a tenant first
+        it('should return user when valid ID is provided', async () => {
+            // Create a user first
             const adminAccessToken = jwks.token({
                 sub: '1',
                 role: Roles.ADMIN,
             });
 
-            const createPayload: ITenantPayload = {
-                name: 'Test Tenant',
-                adress: 'Test Address',
+            const createPayload: UserData = {
+                firstName: 'Test',
+                lastName: 'User',
+                email: 'test@example.com',
+                password: 'password123',
             };
 
             const createResponse = await request(app)
-                .post('/tenants/create')
+                .post('/users/create')
                 .set('Cookie', [`accessToken=${adminAccessToken}`])
                 .send(createPayload);
 
-            const tenantId = (createResponse.body as { id: number }).id;
+            const userId = (createResponse.body as { id: number }).id;
 
-            // Get tenant by ID
+            // Get user by ID
             const response = await request(app)
-                .get(`/tenants/${tenantId}`)
+                .get(`/users/${userId}`)
                 .set('Cookie', [`accessToken=${adminAccessToken}`]);
 
             expect(response.statusCode).toBe(200);
-            const responseBody = response.body as { tenant: Tenant };
-            expect(responseBody.tenant).toHaveProperty('id');
-            expect(responseBody.tenant).toHaveProperty(
-                'name',
-                createPayload.name,
+            const responseBody = response.body as { user: User };
+            expect(responseBody.user).toHaveProperty('id');
+            expect(responseBody.user).toHaveProperty(
+                'firstName',
+                createPayload.firstName,
             );
-            expect(responseBody.tenant).toHaveProperty(
-                'adress',
-                createPayload.adress,
+            expect(responseBody.user).toHaveProperty(
+                'lastName',
+                createPayload.lastName,
             );
+            expect(responseBody.user).toHaveProperty(
+                'email',
+                createPayload.email,
+            );
+            expect(responseBody.user).not.toHaveProperty('password');
         });
 
-        it('should return 404 when tenant does not exist', async () => {
+        it('should return 404 when user does not exist', async () => {
             const adminAccessToken = jwks.token({
                 sub: '1',
                 role: Roles.ADMIN,
             });
 
             const response = await request(app)
-                .get('/tenants/999')
+                .get('/users/999')
                 .set('Cookie', [`accessToken=${adminAccessToken}`]);
 
             expect(response.statusCode).toBe(404);
             const responseBody = response.body as {
                 errors: Array<{ message: string }>;
             };
-            expect(responseBody.errors[0].message).toBe('Tenant not found');
+            expect(responseBody.errors[0].message).toBe('User not found');
         });
     });
 
     describe('Given unauthorized access', () => {
         it('should return 401 status if user not logged in', async () => {
-            const response = await request(app).get('/tenants/1');
+            const response = await request(app).get('/users/1');
 
             expect(response.statusCode).toBe(401);
         });
 
-        it('should return 403 status if user is not admin or manager', async () => {
+        it('should return 403 status if user is not admin', async () => {
             const customerAccessToken = jwks.token({
                 sub: '1',
                 role: Roles.CUSTOMER,
             });
 
             const response = await request(app)
-                .get('/tenants/1')
+                .get('/users/1')
                 .set('Cookie', [`accessToken=${customerAccessToken}`]);
 
             expect(response.statusCode).toBe(403);
@@ -132,18 +126,23 @@ describe('GET /tenants/:id', () => {
     });
 
     describe('Given invalid ID', () => {
-        it('should handle invalid ID format gracefully', async () => {
+        it('should return 400 status for invalid ID format', async () => {
             const adminAccessToken = jwks.token({
                 sub: '1',
                 role: Roles.ADMIN,
             });
 
             const response = await request(app)
-                .get('/tenants/invalid-id')
+                .get('/users/invalid-id')
                 .set('Cookie', [`accessToken=${adminAccessToken}`]);
 
-            // Should handle the invalid ID gracefully
-            expect([400, 404]).toContain(response.statusCode);
+            expect(response.statusCode).toBe(400);
+            const responseBody = response.body as {
+                errors: Array<{ message: string }>;
+            };
+            expect(responseBody.errors[0].message).toBe(
+                'Invalid user ID format',
+            );
         });
     });
 });
