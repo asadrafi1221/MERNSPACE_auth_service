@@ -36,7 +36,7 @@ export const protect = expressjwt({
         } catch (err) {
             const errorMessage =
                 err instanceof Error ? err.message : 'Unknown error';
-            logger.error('Error while validating the refreshToken', {
+            logger.error('Error while validating the refreshToken : ', {
                 error: errorMessage,
             });
         }
