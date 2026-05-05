@@ -1,14 +1,17 @@
 // src/middleware/protect.ts
 import { expressjwt, Request } from 'express-jwt';
-import fs from 'fs';
-import path from 'path';
+import { CONFIG } from '../config';
 import { AuthCookie } from '../types';
 import logger from '../config/logger';
 
-// Read public key directly instead of using JWKS
-const publicKey = fs.readFileSync(
-    path.join(__dirname, '../../certs/public.pem'),
-);
+// Use public key from environment variables
+const publicKey = CONFIG.PUBLIC_KEY || CONFIG.PRIVATE_KEY;
+
+if (!publicKey) {
+    throw new Error(
+        'PUBLIC_KEY or PRIVATE_KEY environment variable is required for JWT verification',
+    );
+}
 
 export const protect = expressjwt({
     secret: publicKey,
