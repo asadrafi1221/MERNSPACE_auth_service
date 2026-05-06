@@ -15,6 +15,15 @@ export class TokenService {
     ) {}
 
     private readPrivateKey(): Buffer {
+        if (process.env.PRIVATE_KEY) {
+            const cleanPrivateKey = process.env.PRIVATE_KEY.replace(
+                /\\n/g,
+                '',
+            ).replace(/\\r/g, '');
+
+            return Buffer.from(cleanPrivateKey, 'utf-8');
+        }
+
         try {
             return fs.readFileSync(
                 path.join(__dirname, '../../certs/private.pem'),

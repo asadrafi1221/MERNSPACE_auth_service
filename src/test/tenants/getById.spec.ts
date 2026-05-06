@@ -11,18 +11,16 @@ import { Tenant } from '../../entity/Tenant';
 describe('GET /tenants/:id', () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
-    const timeout = 60000;
-
     beforeAll(async () => {
         jwks = createJWKSMock('http://localhost:4500');
         connection = await AppDataSource.initialize();
-    }, timeout);
+    });
 
     beforeEach(async () => {
         jwks.start();
         // Database truncate
         await truncateTables(connection);
-    }, timeout);
+    });
 
     afterAll(async () => {
         jwks.stop();
