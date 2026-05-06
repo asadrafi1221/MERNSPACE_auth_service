@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get('/home', (req, res) => {
-    return res.send('welcome to auth service !!!');
+    return res.send('welcome to auth service ');
 });
 
 // global error handler
