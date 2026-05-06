@@ -4,4 +4,4 @@ export const Roles = {
     MANAGER: 'manager',
 } as const;
 
-export const isValid = Roles;
+export const isValid = !Roles;
