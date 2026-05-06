@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { JwtPayload, sign, SignOptions } from 'jsonwebtoken';
 import { Logger } from 'winston';
 import createHttpError from 'http-errors';
@@ -10,8 +10,8 @@ import { Repository } from 'typeorm';
 
 export class TokenService {
     constructor(
-        private refreshTokenRepository: Repository<RefreshToken>,
-        private logger: Logger,
+        private readonly refreshTokenRepository: Repository<RefreshToken>,
+        private readonly logger: Logger,
     ) {}
 
     private readPrivateKey(): Buffer {

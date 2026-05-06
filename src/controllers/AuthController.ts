@@ -9,9 +9,9 @@ import createHttpError from 'http-errors';
 
 export class AuthController {
     constructor(
-        private userService: UserService,
-        private tokenService: TokenService,
-        private logger: Logger,
+        private readonly userService: UserService,
+        private readonly tokenService: TokenService,
+        private readonly logger: Logger,
     ) {}
     async register(
         req: RegisterUserRequest,

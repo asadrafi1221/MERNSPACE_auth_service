@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { AuthController } from '../controllers/AuthController';
 import { UserService } from '../services/UserService';
 import { CredentialService } from '../services/CredentialService';
@@ -24,18 +24,31 @@ const authController = new AuthController(userService, tokenService, logger);
 authRouter.post(
     '/register',
     validate(registerUserSchema),
-    async (req, res, next) => await authController.register(req, res, next),
+    async (req, res, next) => {
+        (await authController.register(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
+    },
 );
 
 authRouter.post('/login', validate(loginUserSchema), async (req, res, next) => {
-    await authController.login(req, res, next);
+    (await authController.login(req, res, next)) as unknown as RequestHandler;
 });
 
 authRouter.get('/self', protect, async (req, res) => {
-    await authController.self(req as AuthRequest, res);
+    (await authController.self(
+        req as AuthRequest,
+        res,
+    )) as unknown as RequestHandler;
 });
 authRouter.post('/refresh', validateRefreshToken, async (req, res, next) => {
-    await authController.refresh(req as AuthRequest, res, next);
+    (await authController.refresh(
+        req as AuthRequest,
+        res,
+        next,
+    )) as unknown as RequestHandler;
 });
 
 export default authRouter;

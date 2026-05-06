@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { UserController } from '../controllers/UserController';
 import { UserService } from '../services/UserService';
 import { AppDataSource } from '../config/data-source';
@@ -26,7 +26,11 @@ userRouter.post(
     validate(createUserSchema),
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await userController.create(req, res, next);
+        (await userController.create(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
@@ -35,7 +39,11 @@ userRouter.post(
     validate(updateUserSchema),
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await userController.update(req, res, next);
+        (await userController.update(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
@@ -44,19 +52,31 @@ userRouter.get(
     validateQuery(getAllUsersSchema),
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await userController.getAllUsers(req, res, next);
+        (await userController.getAllUsers(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
 userRouter.get('/:id', canAccess([Roles.ADMIN]), async (req, res, next) => {
-    await userController.getUserById(req, res, next);
+    (await userController.getUserById(
+        req,
+        res,
+        next,
+    )) as unknown as RequestHandler;
 });
 
 userRouter.delete(
     '/delete/:id',
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await userController.delete(req, res, next);
+        (await userController.delete(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 

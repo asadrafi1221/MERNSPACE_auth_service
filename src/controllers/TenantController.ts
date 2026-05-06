@@ -6,8 +6,8 @@ import createHttpError from 'http-errors';
 
 export class TenantController {
     constructor(
-        private tenantService: TenantService,
-        private logger: Logger,
+        private readonly tenantService: TenantService,
+        private readonly logger: Logger,
     ) {}
 
     async create(req: CreateTenantRequest, res: Response, next: NextFunction) {
@@ -31,9 +31,9 @@ export class TenantController {
     async update(req: CreateTenantRequest, res: Response, next: NextFunction) {
         try {
             const { name, address } = req.body;
-            const tenantId = parseInt((req.params.id as string) || '1');
+            const tenantId = Number.parseInt((req.params.id as string) || '1');
 
-            if (isNaN(tenantId)) {
+            if (Number.isNaN(tenantId)) {
                 const error = createHttpError(400, 'Invalid tenant ID format');
                 return next(error);
             }
@@ -55,9 +55,9 @@ export class TenantController {
 
     async delete(req: CreateTenantRequest, res: Response, next: NextFunction) {
         try {
-            const tenantId = parseInt((req.params.id as string) || '1');
+            const tenantId = Number.parseInt((req.params.id as string) || '1');
 
-            if (isNaN(tenantId)) {
+            if (Number.isNaN(tenantId)) {
                 const error = createHttpError(400, 'Invalid tenant ID format');
                 return next(error);
             }
@@ -98,9 +98,9 @@ export class TenantController {
         next: NextFunction,
     ) {
         try {
-            const tenantId = parseInt((req.params.id as string) || '1');
+            const tenantId = Number.parseInt((req.params.id as string) || '1');
 
-            if (isNaN(tenantId)) {
+            if (Number.isNaN(tenantId)) {
                 const error = createHttpError(400, 'Invalid tenant ID format');
                 return next(error);
             }
