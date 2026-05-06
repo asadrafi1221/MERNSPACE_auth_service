@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 import { Repository } from 'typeorm';
 import { User } from '../entity/User';
 import { UserData, UpdateUserData } from '../types';
@@ -8,8 +8,8 @@ import { CredentialService } from './CredentialService';
 
 export class UserService {
     constructor(
-        private userRepository: Repository<User>,
-        private credentialService: CredentialService,
+        private readonly userRepository: Repository<User>,
+        private readonly credentialService: CredentialService,
     ) {}
 
     get credentialServiceInstance() {
@@ -45,9 +45,11 @@ export class UserService {
 
             return user;
         } catch (err) {
+            const errorMessage =
+                err instanceof Error ? err.message : 'Unknown database error';
             const error = createHttpError(
                 500,
-                'Failed to store the user in database ',
+                `Failed to store the user in database: ${errorMessage}`,
             );
             throw error;
         }

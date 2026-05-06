@@ -1,5 +1,4 @@
-import { Request } from 'express-jwt';
-import { expressjwt } from 'express-jwt';
+import { Request, expressjwt } from 'express-jwt';
 import { JwtPayload } from 'jsonwebtoken';
 import { CONFIG } from '../config';
 import createHttpError from 'http-errors';
@@ -24,7 +23,7 @@ export default expressjwt({
         let payload: JwtPayload | undefined;
 
         try {
-            if (!token || !token.payload) {
+            if (!token?.payload) {
                 return true;
             }
 

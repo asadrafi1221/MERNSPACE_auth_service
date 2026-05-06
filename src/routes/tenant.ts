@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { RequestHandler, Router } from 'express';
 import { TenantController } from '../controllers/TenantController';
 import { TenantService } from '../services/TenantService';
 import { AppDataSource } from '../config/data-source';
@@ -22,7 +22,11 @@ tenantRouter.post(
     validate(createTenantSchema),
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await tenantController.create(req, res, next);
+        (await tenantController.create(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
@@ -31,7 +35,11 @@ tenantRouter.post(
     validate(updateTenantSchema),
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await tenantController.update(req, res, next);
+        (await tenantController.update(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
@@ -39,7 +47,11 @@ tenantRouter.delete(
     '/delete/:id',
     canAccess([Roles.ADMIN]),
     async (req, res, next) => {
-        await tenantController.delete(req, res, next);
+        (await tenantController.delete(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
@@ -47,7 +59,11 @@ tenantRouter.get(
     '/',
     canAccess([Roles.ADMIN, Roles.MANAGER]),
     async (req, res, next) => {
-        await tenantController.getAllTenants(req, res, next);
+        (await tenantController.getAllTenants(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 
@@ -55,7 +71,11 @@ tenantRouter.get(
     '/:id',
     canAccess([Roles.ADMIN, Roles.MANAGER]),
     async (req, res, next) => {
-        await tenantController.getTenantById(req, res, next);
+        (await tenantController.getTenantById(
+            req,
+            res,
+            next,
+        )) as unknown as RequestHandler;
     },
 );
 

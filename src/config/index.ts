@@ -1,5 +1,5 @@
 import { config } from 'dotenv';
-import path from 'path';
+import path from 'node:path';
 
 config({
     path: path.join(__dirname, `../../.env.${process.env.NODE_ENV || 'dev'}`),

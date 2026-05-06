@@ -10,8 +10,8 @@ import createHttpError from 'http-errors';
 
 export class UserController {
     constructor(
-        private userService: UserService,
-        private logger: Logger,
+        private readonly userService: UserService,
+        private readonly logger: Logger,
     ) {}
 
     async create(req: CreateUserRequest, res: Response, next: NextFunction) {
@@ -42,9 +42,9 @@ export class UserController {
         try {
             const { firstName, lastName, email, password, role, tenantId } =
                 req.body;
-            const userId = parseInt((req.params.id as string) || '1');
+            const userId = Number.parseInt((req.params.id as string) || '1');
 
-            if (isNaN(userId)) {
+            if (Number.isNaN(userId)) {
                 const error = createHttpError(400, 'Invalid user ID format');
                 return next(error);
             }
@@ -74,8 +74,8 @@ export class UserController {
         next: NextFunction,
     ) {
         try {
-            const page = parseInt(req.query.page || '1');
-            const limit = parseInt(req.query.limit || '10');
+            const page = Number.parseInt(req.query.page || '1');
+            const limit = Number.parseInt(req.query.limit || '10');
             const search = req.query.search;
 
             const result = await this.userService.getAllUsers({
@@ -98,9 +98,9 @@ export class UserController {
         next: NextFunction,
     ) {
         try {
-            const userId = parseInt((req.params.id as string) || '1');
+            const userId = Number.parseInt((req.params.id as string) || '1');
 
-            if (isNaN(userId)) {
+            if (Number.isNaN(userId)) {
                 const error = createHttpError(400, 'Invalid user ID format');
                 return next(error);
             }
@@ -124,9 +124,9 @@ export class UserController {
 
     async delete(req: CreateUserRequest, res: Response, next: NextFunction) {
         try {
-            const userId = parseInt((req.params.id as string) || '1');
+            const userId = Number.parseInt((req.params.id as string) || '1');
 
-            if (isNaN(userId)) {
+            if (Number.isNaN(userId)) {
                 const error = createHttpError(400, 'Invalid user ID format');
                 return next(error);
             }

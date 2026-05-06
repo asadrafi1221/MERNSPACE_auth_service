@@ -11,13 +11,11 @@ import createJWKSMock from 'mock-jwks';
 describe('POST /users/create', () => {
     let connection: DataSource;
     let jwks: ReturnType<typeof createJWKSMock>;
-    const isCI = process.env.CI === 'true';
-    const timeout = isCI ? 60000 : undefined;
 
     beforeAll(async () => {
         jwks = createJWKSMock('http://localhost:4500');
         connection = await AppDataSource.initialize();
-    }, timeout);
+    });
 
     beforeEach(async () => {
         jwks.start();
